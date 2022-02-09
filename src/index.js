@@ -7,7 +7,7 @@ $(document).ready(function() {
 
 	Swiper.use([ EffectClip ])
 
-	new Swiper('.swiper-container', {
+	const swiper = new Swiper('.swiper-container', {
 		loop: true,
 		speed: 1500,
 		effect: 'clip',
@@ -17,10 +17,10 @@ $(document).ready(function() {
 			nextEl: '.swiper-button-next',
 			prevEl: '.swiper-button-prev'
 		},
-		autoplay: {
-			delay: 500,
-			waitForTransition: true	/** important (or just make sure delay > speed) */
-		},
+		// autoplay: {
+		// 	delay: 500,
+		// 	waitForTransition: true	/** important (or just make sure delay > speed) */
+		// },
 		on: {
 			touchStart() {
 				const swiper = this
@@ -30,6 +30,11 @@ $(document).ready(function() {
 			slideChange: onSlideChange
 		}
 	})
+
+	// $(swiper.wrapperEl).hover(
+	// 	function() { swiper.autoplay.stop() }, 
+	// 	function() { swiper.autoplay.start() }
+	// )
 
 })
 

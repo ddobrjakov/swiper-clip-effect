@@ -11,6 +11,9 @@ export default function EffectClip({ swiper, extendParams, on }) {
 		const { slides } = swiper
 		const params = swiper.params.clipEffect
 
+		const { active, second } = clipped(swiper)
+		const activeProgress = swiper.slides.eq(active)[0].progress
+
 		for (let i = 0; i < slides.length; i += 1) {
 			
 			const $slide = swiper.slides.eq(i)
@@ -25,10 +28,8 @@ export default function EffectClip({ swiper, extendParams, on }) {
 			const progress = slide.progress
 
 			const zIndex = (() => {
-				if (Math.abs(progress) > 1) return -1
-				if (progress === 1) return 0
-				if (progress > -1 && progress < 0) return 0
-				if (progress >= 0) return 1
+				if (i === active) return 1
+				if (i === second) return 0
 				return -1
 			})()
 
@@ -37,9 +38,12 @@ export default function EffectClip({ swiper, extendParams, on }) {
 			const leftClipPath = (cssBound) => `polygon(${cssBound}% 0%, 100% 0%, 100% 100%, ${cssBound}% 100%)`
 
 			const slideClipPath = (() => {
-				if (Math.abs(progress) > 1) return rightClipPath(cssBound(1))
-				if (progress >= 0 && progress <= 1) return rightClipPath(cssBound(progress))
-				if (progress <= 0 && progress >= -1) return leftClipPath(cssBound(-progress))
+				if (i === active && activeProgress >= 0) return rightClipPath(cssBound(activeProgress))
+				if (i === active && activeProgress <= 0) return leftClipPath(cssBound(-activeProgress))
+				if (i === second && activeProgress >= 0) return leftClipPath(cssBound(1-activeProgress))
+				if (i === second && activeProgress <= 0) return rightClipPath(cssBound(1+activeProgress))
+				if (progress >= activeProgress) return rightClipPath(cssBound(1))
+				if (progress <= activeProgress) return leftClipPath(cssBound(1))
 			})()
 
 			effectTarget(params, $slide)
@@ -47,6 +51,7 @@ export default function EffectClip({ swiper, extendParams, on }) {
 				.transform(`translate3d(${tx}px, ${ty}px, 0px)`)
 
 		}
+
 	}
 
 	const setTransition = (duration) => {
@@ -71,4 +76,53 @@ export default function EffectClip({ swiper, extendParams, on }) {
 		}),
 	})
 
+}
+
+/**
+ * Find original index of potentially duplicate slide.
+ * 
+ * Example: [*0*, 1, 2, 3, 4, *5*].map(original) = [4, 1, 2, 3, 4, 1]
+ * 
+ * @param {Object} swiper Swiper instance.
+ * @param {Number} index Slide to find original index of.
+ */
+ function original(swiper, index) {
+	const oneSideLooped = swiper.loopedSlides || 0
+	const real = swiper.slides.length - oneSideLooped * 2
+	const mod = (n, m) => ((n % m) + m) % m
+	return mod(index - oneSideLooped, real) + oneSideLooped
+}
+
+/**
+ * Find two slides that need to be clipped.
+ * @param {Swiper} swiper Swiper instance.
+ * @returns Active slide and second slide.
+ */
+function clipped(swiper) {
+	const active = activeIndex(swiper)
+	const activeProgress = swiper.slides.eq(active)[0].progress
+	var second = [...swiper.slides].findIndex((slide, index) => 
+		index != active && (activeProgress >= 0
+			? slide.progress >= -1 && slide.progress <= 0
+			: slide.progress >= 0 && slide.progress <= 1))
+	if (second === -1)
+		second = activeProgress >= 0
+			? original(swiper, original(swiper, swiper.slides.length - 1) + 1)
+			: original(swiper, original(swiper, 0) - 1)
+	return { active, second }
+}
+
+/**
+ * Get index of active Swiper slide.
+ * @description Sometimes swiper.activeIndex returns a slide with progress outside [-1, 1] range.
+ * Not sure if this is intended, but it's undesired and addressed in this function.
+ * @param {Swiper} swiper Swiper instance.
+ */
+function activeIndex(swiper) {
+	const _activeIndex = swiper.activeIndex
+	const _activeProgress = swiper.slides.eq(_activeIndex)[0].progress
+	if (Math.abs(_activeProgress) <= 1) return _activeIndex
+	const zeroIndex = [...swiper.slides].findIndex(slide => slide.progress === 0)
+	console.log('zeroIndex', zeroIndex)
+	return (zeroIndex !== -1) ? zeroIndex : _activeIndex
 }
