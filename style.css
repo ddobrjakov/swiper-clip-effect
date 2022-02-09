@@ -30,20 +30,6 @@ body {
 	background-position: center;
 }
 
-.copy {
-	position: absolute;
-	bottom: 15px;
-	left: 0;
-	right: 0;
-	text-align: center;
-	color: white;
-	letter-spacing: 0.06em;
-}
-
-a {
-	color: white;
-}
-
 /** Swiper Clip Effect */
 
 .swiper-clip.swiper-free-mode .swiper-slide {
