@@ -28,7 +28,7 @@ function transitionSegment(active, second) {
 		equals: function(segment) { return this.active === segment.active && this.second === segment.second },
 		reverse: function(segment) { return this.active === segment.second && this.second === segment.active },
 		equivalent: function(segment) { return this.equals(segment) || this.reverse(segment) },
-		isNaN: () => isNaN(active),
+		isNaN: () => isNaN(active) || isNaN(second),
 	}
 }
 
@@ -86,8 +86,10 @@ export default function EffectClip({ swiper, extendParams, on }) {
 				if (progress <= activeProgress) return leftClipPath(cssBound(1))
 			})()
 
+			const visibility = ((i === active) || (i === second)) ? 'visible' : 'hidden'
+
 			effectTarget(params, $slide)
-				.css({ zIndex: zIndex, clipPath: slideClipPath })
+				.css({ zIndex: zIndex, clipPath: slideClipPath, visibility })
 				.transform(`translate3d(${tx}px, ${ty}px, 0px)`)
 
 		}

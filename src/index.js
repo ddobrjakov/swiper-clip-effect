@@ -17,10 +17,10 @@ $(document).ready(function() {
 			nextEl: '.swiper-button-next',
 			prevEl: '.swiper-button-prev'
 		},
-		// autoplay: {
-		// 	delay: 500,
-		// 	waitForTransition: true	/** important (or just make sure delay > speed) */
-		// },
+		autoplay: {
+			delay: 500,
+			waitForTransition: true	/** important (or just make sure delay > speed) */
+		},
 		on: {
 			touchStart() {
 				const swiper = this
@@ -31,12 +31,27 @@ $(document).ready(function() {
 		}
 	})
 
-	// $(swiper.wrapperEl).hover(
-	// 	function() { swiper.autoplay.stop() }, 
-	// 	function() { swiper.autoplay.start() }
-	// )
+	setupAutoplay(swiper)
 
 })
+
+function setupAutoplay(swiper) {
+	
+	var touch = false
+	swiper.on('touchStart', function() { touch = true })
+	swiper.on('touchEnd', function() { touch = false; maybeStartAutoplay() })
+
+	var hover = false
+	$(swiper.wrapperEl).hover(
+		function() { hover = true; swiper.autoplay.stop() }, 
+		function() { hover = false; maybeStartAutoplay() }
+	)
+
+	const maybeStartAutoplay = () => { 
+		if (!touch && !hover) swiper.autoplay.start() 
+	}
+
+}
 
 function onSlideChange() {
 	/** Do something when slide changes. */
