@@ -9,6 +9,7 @@ $(document).ready(function() {
 
 	const swiper = new Swiper('.swiper-container', {
 		loop: true,
+		loopedSlides: 2,
 		speed: 1500,
 		effect: 'clip',
 		preventInteractionOnTransition: false,
@@ -17,24 +18,31 @@ $(document).ready(function() {
 			nextEl: '.swiper-button-next',
 			prevEl: '.swiper-button-prev'
 		},
-		autoplay: {
-			delay: 500,
-			reverseDirection: false,
-			waitForTransition: true	/** important (or just make sure delay > speed) */
-		},
+		// autoplay: {
+		// 	delay: 1000,
+		// 	reverseDirection: true,
+		// 	disableOnInteraction: false,
+		// 	waitForTransition: true	/** important (or just make sure delay > speed) */
+		// },
 		on: {
-			slideChange: onSlideChange
+			slideChange: onSlideChange,
+			progress: function() {
+				const bracketsForActive = (index, z) => index === this.activeIndex ? '['+z+']' : z
+				console.log([...this.slides].map((slide, index) => bracketsForActive(index, $(slide).css('zIndex'))))
+			}
 		}
 	})
 
+	console.log('hello')
+
 	enableTransitionPausing(swiper)
-	enableAutoplayOnHover(swiper)
+	// enableAutoplayOnHover(swiper)
 
 })
 
 function enableTransitionPausing(swiper) {
 	swiper.on('touchStart', function() { this.setProgress(estimatedProgress(this)) })
-	swiper.on('touchEnd', function() { this.slideToClosest(this.params.speed) })
+	swiper.on('touchEnd', function() { this.slideToClosest(this.params.speed, false) })
 }
 
 function enableAutoplayOnHover(swiper) {

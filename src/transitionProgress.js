@@ -61,12 +61,7 @@ export function estimatedProgress(swiper) {
 	const sprogress = segment * activeIndex
 	const tprogress = transitionProgress(swiper)
 
-	/*
-		By the end of transition, active slide must fit the wrapper.
-		bindL => transition goes to the right => progress goes back
-		bindR => transition goes to the left => progress goes forward
-	*/
-
+	/* By the end of transition, active slide must fit the wrapper. */
 	if (tprogress.progress === 0) return sprogress
 	const kbind = tprogress.bind.includes('L') ? 1 : -1
 	return sprogress + (1 - tprogress.progress) * segment * kbind

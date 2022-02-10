@@ -33,12 +33,12 @@ body {
 /** Swiper Clip Effect */
 
 .swiper-clip.swiper-free-mode .swiper-slide {
-	transition-timing-function: ease-out
+	transition-timing-function: ease-out;
 }
 
 .swiper-clip .swiper-slide {
 	pointer-events: none;
-	transition-property: clip-path;
+	transition: clip-path, z-index step-end;
 }
 
 .swiper-clip .swiper-slide .swiper-slide {
