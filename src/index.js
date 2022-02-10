@@ -19,6 +19,7 @@ $(document).ready(function() {
 		},
 		autoplay: {
 			delay: 500,
+			reverseDirection: true,
 			waitForTransition: true	/** important (or just make sure delay > speed) */
 		},
 		on: {
@@ -26,6 +27,10 @@ $(document).ready(function() {
 				const swiper = this
 				/** Stop any ongoing transition. */
 				this.setProgress(estimatedProgress(swiper))
+			},
+			touchEnd() {
+				const swiper = this
+				swiper.slideToClosest(swiper.params.speed)
 			},
 			slideChange: onSlideChange
 		}
@@ -48,6 +53,7 @@ function setupAutoplay(swiper) {
 	)
 
 	const maybeStartAutoplay = () => { 
+		// console.log('should start autoplay?', !touch && !hover, `(${touch}, ${hover})`)
 		if (!touch && !hover) swiper.autoplay.start() 
 	}
 
