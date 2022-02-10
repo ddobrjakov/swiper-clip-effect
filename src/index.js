@@ -19,44 +19,38 @@ $(document).ready(function() {
 		},
 		autoplay: {
 			delay: 500,
-			reverseDirection: true,
+			reverseDirection: false,
 			waitForTransition: true	/** important (or just make sure delay > speed) */
 		},
 		on: {
-			touchStart() {
-				const swiper = this
-				/** Stop any ongoing transition. */
-				this.setProgress(estimatedProgress(swiper))
-			},
-			touchEnd() {
-				const swiper = this
-				swiper.slideToClosest(swiper.params.speed)
-			},
 			slideChange: onSlideChange
 		}
 	})
 
-	setupAutoplay(swiper)
+	enableTransitionPausing(swiper)
+	enableAutoplayOnHover(swiper)
 
 })
 
-function setupAutoplay(swiper) {
-	
+function enableTransitionPausing(swiper) {
+	swiper.on('touchStart', function() { this.setProgress(estimatedProgress(this)) })
+	swiper.on('touchEnd', function() { this.slideToClosest(this.params.speed) })
+}
+
+function enableAutoplayOnHover(swiper) {
 	var touch = false
 	swiper.on('touchStart', function() { touch = true })
 	swiper.on('touchEnd', function() { touch = false; maybeStartAutoplay() })
-
+	
 	var hover = false
 	$(swiper.wrapperEl).hover(
 		function() { hover = true; swiper.autoplay.stop() }, 
 		function() { hover = false; maybeStartAutoplay() }
 	)
 
-	const maybeStartAutoplay = () => { 
-		// console.log('should start autoplay?', !touch && !hover, `(${touch}, ${hover})`)
+	function maybeStartAutoplay() { 
 		if (!touch && !hover) swiper.autoplay.start() 
 	}
-
 }
 
 function onSlideChange() {

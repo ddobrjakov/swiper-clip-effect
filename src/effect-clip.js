@@ -49,7 +49,6 @@ export default function EffectClip({ swiper, extendParams, on }) {
 
 		/** Keep track of previous transition segments */
 		transitionSegments.setSegment(transitionSegment(active, _second))
-		// console.log({ active, second, activeProgress })
 
 		for (let i = 0; i < slides.length; i += 1) {
 			
