@@ -36,7 +36,10 @@ $(document).ready(function() {
 
 function enableTransitionPausing(swiper) {
 	swiper.on('touchStart', function() { this.setProgress(estimatedProgress(this)) })
-	swiper.on('touchEnd', function() { this.animating && this.slideToClosest(this.params.speed) })
+	swiper.on('touchEnd', function() { 
+		const changedTranslate = Math.abs(this.touchEventsData.startTranslate - this.touchEventsData.currentTranslate) > 10e-6
+		;(!changedTranslate || !this.touchEventsData.isMoved || this.touchEventsData.isScrolling) && this.slideToClosest(this.params.speed)
+	})
 }
 
 function enableAutoplayOnHover(swiper) {
