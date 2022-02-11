@@ -27,13 +27,13 @@ export default function EffectClip({ swiper, extendParams, on }) {
 			const zIndex = -Math.abs(Math.floor(progress - 0.5)) + slides.length
 
 			const cssBound = (bound) => (bound * 100).toFixed(2)
-			const rightClipPath = (cssBound) => `polygon(0% 0%, ${100-cssBound}% 0%, ${100-cssBound}% 100%, 0% 100%)`
-			const leftClipPath = (cssBound) => `polygon(${cssBound}% 0%, 100% 0%, 100% 100%, ${cssBound}% 100%)`
+			const clippedRight = (cssBound) => `polygon(0% 0%, ${100-cssBound}% 0%, ${100-cssBound}% 100%, 0% 100%)`
+			const clippedLeft = (cssBound) => `polygon(${cssBound}% 0%, 100% 0%, 100% 100%, ${cssBound}% 100%)`
 
 			const slideClipPath = (() => {
-				if (Math.abs(progress) > 1) return rightClipPath(cssBound(1))
-				if (progress >= 0 && progress <= 1) return rightClipPath(cssBound(progress))
-				if (progress <= 0 && progress >= -1) return leftClipPath(cssBound(-progress))
+				if (Math.abs(progress) > 1) return clippedRight(cssBound(1))
+				if (progress >= 0 && progress <= 1) return clippedRight(cssBound(progress))
+				if (progress <= 0 && progress >= -1) return clippedLeft(cssBound(-progress))
 			})()
 
 			effectTarget(params, $slide)
