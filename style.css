@@ -38,7 +38,7 @@ body {
 
 .swiper-clip .swiper-slide {
 	pointer-events: none;
-	transition: clip-path, z-index step-end;
+	transition: clip-path;
 }
 
 .swiper-clip .swiper-slide .swiper-slide {
