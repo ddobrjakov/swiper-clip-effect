@@ -32,38 +32,48 @@ function parsePolygonClipPathCSS(clipPathString) {
 }
 
 /**
- * Estimated transition progress based on clip-path property of active slide.
+ * Estimated transition progress based on clip-path property of target slide.
  * @param {Swiper} swiper Swiper instance.
- * @returns {Object} Transition progress (from 0 to 1) and static bound (left / right).
+ * @returns {Object} Slide transition progress (from 0 to 1).
  */
-export function transitionProgress(swiper) {
-	const activeSlide = $(swiper.slides[swiper.activeIndex])
-	const clipPath = activeSlide.css('clipPath')
+export function transitionProgress(swiper, targetIndex) {
+	const targetSlide = $(swiper.slides[targetIndex])
+	const clipPath = targetSlide.css('clipPath')
 	const bounds = parsePolygonClipPathCSS(clipPath) || ['0','0','100','0','100','100','0','100']
-	const bindL = bounds[1] === '0' && bounds[7] === '0'
-	const bindR = bounds[3] === '100' && bounds[5] === '100'
-	if (bindL && bindR) return { bind: ['L', 'R'], progress: 0 }
-	if (bindL) return { bind: ['L'], progress: Number(bounds[3]) / 100 }
-	if (bindR) return { bind: ['R'], progress: 1 - (Number(bounds[1]) / 100) }
-	return { bind: [ ], progress: NaN }	// !bindL && !bindR – should not happen
+	return Number(bounds[3]) / 100
 }
 
 /**
- * Calculate progress during transition. Uses CSS of active slide.
+ * Calculate progress during transition. Uses CSS of transitioning slide.
  * This value differs from Swiper progress significantly during transitions.
  * @param {Swiper} swiper Swiper instance.
  * @returns {Number} Estimated progress (0 to 1).
  */
 export function estimatedProgress(swiper) {
-
-	const segment = 1 / (swiper.slides.length - 1)
-	const activeIndex = swiper.activeIndex
-	const sprogress = segment * activeIndex
-	const tprogress = transitionProgress(swiper)
-
-	/* By the end of transition, active slide must fit the wrapper. */
-	if (tprogress.progress === 0) return sprogress
-	const kbind = tprogress.bind.includes('L') ? 1 : -1
-	return sprogress + (1 - tprogress.progress) * segment * kbind
-
+	/** Find candidates for transitioning slide.  */
+	function targetIndexCandidates(swiper) {
+		const isCandidate = slide => slide.progress >= 0 && slide.progress <= 1
+		return [...swiper.slides].reduce((acc, slide, index) => isCandidate(slide) ? (acc.push(index), acc) : acc , [ ])
+	}
+	/** Estimate progress with known targetIndex (index of transitioning slide). */
+	function estimateProgress(targetIndex) {
+		const segment = 1 / (swiper.slides.length - 1)
+		const sprogress = segment * targetIndex
+		const tprogress = transitionProgress(swiper, targetIndex)
+		/* By the end of transition, active slide must fit the wrapper. */
+		return sprogress + (1 - tprogress) * segment
+	}
+	/** Tell if slide is in snap position. */
+	function isSnapped(progress) {
+		const segmentSize = 1 / (swiper.slides.length - 1)
+		const segmentIndex = ~~(progress/segmentSize)
+		const diff = progress - segmentIndex * segmentSize
+		return (diff < 10e-6 || Math.abs(segmentSize - diff) < 10e-6)
+	}
+	const indexCandidates = targetIndexCandidates(swiper)
+	const candidates = indexCandidates.map(targetIndex => ({ targetIndex, progress: estimateProgress(targetIndex) }))
+	if (candidates.length > 2 || candidates.length === 0) return NaN
+	if ((candidates.length === 1) || (Math.abs(candidates[0].progress - candidates[1].progress) < 10e-6)) return candidates[0].progress
+	const transitioning = candidates.filter(({ progress }) => !isSnapped(progress))
+	return (transitioning.length !== 1) ? NaN : transitioning[0].progress
 }

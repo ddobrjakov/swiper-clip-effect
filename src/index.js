@@ -18,25 +18,19 @@ $(document).ready(function() {
 			nextEl: '.swiper-button-next',
 			prevEl: '.swiper-button-prev'
 		},
-		// autoplay: {
-		// 	delay: 1000,
-		// 	reverseDirection: true,
-		// 	disableOnInteraction: false,
-		// 	waitForTransition: true	/** important (or just make sure delay > speed) */
-		// },
+		autoplay: {
+			delay: 1000,
+			reverseDirection: false,
+			disableOnInteraction: false,
+			waitForTransition: true	/** important (or just make sure delay > speed) */
+		},
 		on: {
-			slideChange: onSlideChange,
-			progress: function() {
-				const bracketsForActive = (index, z) => index === this.activeIndex ? '['+z+']' : z
-				console.log([...this.slides].map((slide, index) => bracketsForActive(index, $(slide).css('zIndex'))))
-			}
+			slideChange: onSlideChange
 		}
 	})
 
-	console.log('hello')
-
 	enableTransitionPausing(swiper)
-	// enableAutoplayOnHover(swiper)
+	enableAutoplayOnHover(swiper)
 
 })
 

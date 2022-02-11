@@ -24,7 +24,7 @@ export default function EffectClip({ swiper, extendParams, on }) {
 			
 			const progress = slide.progress
 
-			slide.style.zIndex = -Math.abs(Math.round(progress-0.5)) + slides.length// slides.length - i
+			slide.style.zIndex = -Math.abs(Math.floor(progress-0.5)) + slides.length
 
 			const cssBound = (bound) => (bound * 100).toFixed(2)
 			const filled = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
