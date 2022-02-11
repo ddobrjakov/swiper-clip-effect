@@ -24,19 +24,26 @@ export default function EffectClip({ swiper, extendParams, on }) {
 			
 			const progress = slide.progress
 
-			slide.style.zIndex = -Math.abs(Math.floor(progress-0.5)) + slides.length
+			const zIndex = (() => {
+				if (Math.abs(progress) > 1) return -1
+				if (progress === 1) return 0
+				if (progress > -1 && progress < 0) return 0
+				if (progress >= 0) return 1
+				return -1
+			})()
 
 			const cssBound = (bound) => (bound * 100).toFixed(2)
-			const filled = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
-			const clipped = (cssBound) => `polygon(0% 0%, ${100-cssBound}% 0%, ${100-cssBound}% 100%, 0% 100%)`
+			const rightClipPath = (cssBound) => `polygon(0% 0%, ${100-cssBound}% 0%, ${100-cssBound}% 100%, 0% 100%)`
+			const leftClipPath = (cssBound) => `polygon(${cssBound}% 0%, 100% 0%, 100% 100%, ${cssBound}% 100%)`
+
 			const slideClipPath = (() => {
-				if (progress >= 0 && progress <= 1) return clipped(cssBound(progress))
-				if (progress > 1) return clipped(cssBound(1))
-				return filled
+				if (Math.abs(progress) > 1) return rightClipPath(cssBound(1))
+				if (progress >= 0 && progress <= 1) return rightClipPath(cssBound(progress))
+				if (progress <= 0 && progress >= -1) return leftClipPath(cssBound(-progress))
 			})()
 
 			effectTarget(params, $slide)
-				.css({ clipPath: slideClipPath })
+				.css({ zIndex, clipPath: slideClipPath })
 				.transform(`translate3d(${tx}px, ${ty}px, 0px)`)
 
 		}

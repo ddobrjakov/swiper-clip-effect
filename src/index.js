@@ -36,7 +36,7 @@ $(document).ready(function() {
 
 function enableTransitionPausing(swiper) {
 	swiper.on('touchStart', function() { this.setProgress(estimatedProgress(this)) })
-	swiper.on('touchEnd', function() { this.slideToClosest(this.params.speed, false) })
+	swiper.on('touchEnd', function() { this.animating && this.slideToClosest(this.params.speed) })
 }
 
 function enableAutoplayOnHover(swiper) {
