@@ -24,13 +24,7 @@ export default function EffectClip({ swiper, extendParams, on }) {
 			
 			const progress = slide.progress
 
-			const zIndex = (() => {
-				if (Math.abs(progress) > 1) return -1
-				if (progress === 1) return 0
-				if (progress > -1 && progress < 0) return 0
-				if (progress >= 0) return 1
-				return -1
-			})()
+			const zIndex = -Math.abs(Math.floor(progress - 0.5)) + slides.length
 
 			const cssBound = (bound) => (bound * 100).toFixed(2)
 			const rightClipPath = (cssBound) => `polygon(0% 0%, ${100-cssBound}% 0%, ${100-cssBound}% 100%, 0% 100%)`
